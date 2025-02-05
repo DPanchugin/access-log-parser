@@ -87,6 +87,9 @@ public class Main {
         System.out.println("Доли запросов от разных ОС: " + statistics.getStatisticsOs());
         System.out.println("Список несуществующих страниц сайта: " + statistics.getNoExistPages());
         System.out.println("Доли запросов от разных браузеров: " + statistics.getStatisticsBrow());
+        System.out.println("Среднее количество посещений сайта за час: " + statistics.getAvgCountVisits());
+        System.out.println("Среднее количество ошибочных запросов в час: " + statistics.getAvgCountErrors());
+        System.out.println("Средняя посещаемость одним пользователем: " + statistics.getAvgVisitsOneUser());
         scanner.close();
     }
 

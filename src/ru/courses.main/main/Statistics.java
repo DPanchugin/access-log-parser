@@ -7,9 +7,12 @@ import java.util.*;
 import static javax.swing.UIManager.put;
 
 public class Statistics {
+    private int countVisits = 0;
+    private int countErrors = 0;
     private int totalTraffic = 0;
     private LocalDateTime minTime;
     private LocalDateTime maxTime;
+    private HashSet<String> ipRealUsers = new HashSet<>();
     private HashSet<String> allPages = new HashSet<>();
     private HashMap<String, Integer> occurrenceOs = new HashMap<>();
 
@@ -67,7 +70,16 @@ public class Statistics {
                     occurrenceBrow.put(logEntry.getUserAgent().getTypeBrowser(), occurrenceBrow.get(logEntry.getUserAgent().getTypeBrowser()) + 1);
                 } else occurrenceBrow.put(String.valueOf(logEntry.getUserAgent().getTypeBrowser()), 1);
             }
+            if (!logEntry.getUserAgent().isBot()) {
+                countVisits++;
+                this.ipRealUsers.add(logEntry.getIpAddr());
+            }
+
+            if (Integer.toString(logEntry.getResponseCode()).charAt(0) == '4' || Integer.toString(logEntry.getResponseCode()).charAt(0) == '5') {
+                countErrors++;
+            }
         }
+
     }
 
     public int getTrafficRate() {
@@ -137,5 +149,20 @@ public class Statistics {
         return fractionBrow;
     }
 
+    public int getAvgCountVisits() {
+        int hour = getAmountHours();
+        return countVisits / hour;
+    }
+
+    public int getAvgCountErrors() {
+        int hour = getAmountHours();
+        return countErrors / hour;
+    }
+
+    public int getAvgVisitsOneUser () {
+        return countVisits / ipRealUsers.size();
+    }
+
 }
+
 

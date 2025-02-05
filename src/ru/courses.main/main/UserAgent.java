@@ -79,7 +79,6 @@ public class UserAgent {
         TypeOs(String name) {
             this.name = name;
         }
-
         public static String forValue(String nameOs) {
             for (TypeOs typeOs1 : TypeOs.values()) {
                 if (typeOs1.name.equals(nameOs)) {
@@ -89,7 +88,6 @@ public class UserAgent {
             return "-";
         }
     }
-
     private boolean isBot(String userAgent) {
         if (getTypeBrowser().equals("-")) {
             return false;
