@@ -1,6 +1,4 @@
 package ru.courses.main.main;
-
-
 import ru.courses.main.main.LogEntry;
 import ru.courses.main.main.MaxLengthLineException;
 import ru.courses.main.main.Statistics;
@@ -83,11 +81,12 @@ public class Main {
         System.out.println("Путь к файлу указан верно. Количество затраченных попыток " + count);
         System.out.println("Общее количество строк в файле: " + countLine);
         System.out.println("Средний объём трафика за час: " + statistics.getTrafficRate());
-        System.out.println("Доля запросов от Googlebot в %: " + (double) (countGoogle*100) / countLine);
-        System.out.println("Доля запросов от YandexBot в %: " + (double) (countYandex*100) / countLine);
+        System.out.println("Доля запросов от Googlebot в %: " + (double) (countGoogle * 100) / countLine);
+        System.out.println("Доля запросов от YandexBot в %: " + (double) (countYandex * 100) / countLine);
         System.out.println("Список существующих страниц сайта: " + statistics.getAllExistPages());
         System.out.println("Доли запросов от разных ОС: " + statistics.getStatisticsOs());
-
+        System.out.println("Список несуществующих страниц сайта: " + statistics.getNoExistPages());
+        System.out.println("Доли запросов от разных браузеров: " + statistics.getStatisticsBrow());
         scanner.close();
     }
 
