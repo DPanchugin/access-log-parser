@@ -85,6 +85,8 @@ public class Main {
         System.out.println("Средний объём трафика за час: " + statistics.getTrafficRate());
         System.out.println("Доля запросов от Googlebot в %: " + (double) (countGoogle*100) / countLine);
         System.out.println("Доля запросов от YandexBot в %: " + (double) (countYandex*100) / countLine);
+        System.out.println("Список существующих страниц сайта: " + statistics.getAllExistPages());
+        System.out.println("Доли запросов от разных ОС: " + statistics.getStatisticsOs());
 
         scanner.close();
     }

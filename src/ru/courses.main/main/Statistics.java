@@ -9,6 +9,8 @@ public class Statistics {
     private LocalDateTime minTime;
     private LocalDateTime maxTime;
     private HashSet<String> allPages = new HashSet<>();
+    private HashMap<String, Integer> occurrenceOs = new HashMap<>();
+    private HashMap<String, Double> fractionOs = new HashMap<>();
     public Statistics() {
     }
 
@@ -42,6 +44,14 @@ public class Statistics {
             if (maxTime.isBefore(logEntry.getTime())) {
                 this.maxTime = logEntry.getTime();
             }
+            if (logEntry.getResponseCode() == 200) {
+                this.allPages.add(logEntry.getPathUrl());
+            }
+            if (!(logEntry.getUserAgent().getTypeOs().equals("-"))) {
+                if (occurrenceOs.containsKey(logEntry.getUserAgent().getTypeOs())) {
+                    occurrenceOs.put(logEntry.getUserAgent().getTypeOs(), occurrenceOs.get(logEntry.getUserAgent().getTypeOs()) + 1);
+                } else occurrenceOs.put(String.valueOf(logEntry.getUserAgent().getTypeOs()), 1);
+            }
         }
 
     }
@@ -70,5 +80,22 @@ public class Statistics {
             } else hour += maxTime.getHour() - minTime.getHour();
         }
         return hour;
+    }
+    public ArrayList<String> getAllExistPages() {
+        List<String> pages = new ArrayList<>();
+        for (String page : allPages) {
+            pages.add(page);
+        }
+        return new ArrayList<>(pages);
+    }
+    public HashMap<String, Double> getStatisticsOs() {
+        Integer countRequest = 0;
+        for (Map.Entry<String, Integer> entry : occurrenceOs.entrySet()) {
+            countRequest += entry.getValue();
+        }
+        for (Map.Entry<String, Integer> entry : occurrenceOs.entrySet()) {
+            fractionOs.put(entry.getKey(), entry.getValue().doubleValue() / countRequest.doubleValue());
+        }
+        return fractionOs;
     }
 }
