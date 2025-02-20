@@ -8,34 +8,35 @@ public class UserAgent {
     final boolean isBot;
 
     public UserAgent(String userAgent) {
-        String s;
+        String s = "OTHER";
         String s2 = "";
 
         if (userAgent.equals("-")) {
             this.typeBrowser = "-";
         } else {
-            if (userAgent.indexOf('/') == -1) {
-                s = userAgent.trim();
-            } else {
-                if (!(userAgent.indexOf('/') == -1)) {
-                    s = userAgent.substring(0, userAgent.indexOf('/')).trim();
-                } else s = "";
+            for (TypeBrowse typeBrowse : TypeBrowse.values()) {
+                if (userAgent.contains(typeBrowse.name)) {
+                    s = typeBrowse.name;
+                    break;
+                }
             }
             this.typeBrowser = String.valueOf(TypeBrowse.forValue(s));
         }
+
         if (getTypeBrowser().equals("-")) {
             this.typeOs = "-";
         } else {
             for (TypeOs typeOs1 : TypeOs.values()) {
-                int i = userAgent.indexOf(typeOs1.name);
-                if (!(i == -1)) {
-                    int i2 = i + typeOs1.name.length();
-                    s2 = userAgent.substring(i, i2);
+                int osIndex = userAgent.indexOf(typeOs1.name);
+                if (osIndex != -1) {
+                    int osEndIndex = osIndex + typeOs1.name.length();
+                    s2 = userAgent.substring(osIndex, osEndIndex);
                     break;
-                } else s2 = "";
+                }
             }
             this.typeOs = String.valueOf(TypeOs.forValue(s2));
         }
+
         this.isBot = isBot(userAgent);
     }
 

@@ -1,8 +1,10 @@
 package ru.courses.main.main;
 
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static javax.swing.UIManager.put;
 
@@ -20,6 +22,9 @@ public class Statistics {
     private HashMap<String, Integer> occurrenceBrow = new HashMap<>();
     private HashMap<String, Double> fractionOs = new HashMap<>();
     private HashMap<String, Double> fractionBrow = new HashMap<>();
+    private HashSet<String> domains = new HashSet<>();
+    private HashMap<String, Integer> countVisitsRealUsers = new HashMap<>();
+    private HashMap<Integer, Integer> countRequestPerSec = new HashMap<>();
 
     public Statistics() {
     }
@@ -55,10 +60,10 @@ public class Statistics {
                 this.maxTime = logEntry.getTime();
             }
             if (logEntry.getResponseCode() == 200) {
-                this.allPages.add(logEntry.getPathUrl());
+                this.allPages.add(logEntry.getPath());
             }
             if (logEntry.getResponseCode() == 404) {
-                this.noExistPages.add(logEntry.getPathUrl());
+                this.noExistPages.add(logEntry.getPath());
             }
             if (!(logEntry.getUserAgent().getTypeOs().equals("-"))) {
                 if (occurrenceOs.containsKey(logEntry.getUserAgent().getTypeOs())) {
@@ -75,12 +80,33 @@ public class Statistics {
                 this.ipRealUsers.add(logEntry.getIpAddr());
             }
 
-            if (Integer.toString(logEntry.getResponseCode()).charAt(0) == '4' || Integer.toString(logEntry.getResponseCode()).charAt(0) == '5') {
-                countErrors++;
-            }
+            ArrayList<String> uniqueCodeSec = new ArrayList<>(Arrays.asList(
+                    Integer.toString(logEntry.getTime().getMonth().getValue()),
+                    Integer.toString(logEntry.getTime().getDayOfMonth()),
+                    Integer.toString(logEntry.getTime().getHour()),
+                    Integer.toString(logEntry.getTime().getMinute()),
+                    Integer.toString(logEntry.getTime().getSecond())
+            ));
+            Integer secCode = Integer.parseInt(uniqueCodeSec.stream().collect(Collectors.joining()));
+            if (countRequestPerSec.containsKey(secCode)) {
+                this.countRequestPerSec.put(secCode, countRequestPerSec.get(secCode) + 1);
+            } else this.countRequestPerSec.put(secCode, 1);
+
+            if (countVisitsRealUsers.containsKey(logEntry.getIpAddr())) {
+                countVisitsRealUsers.put(logEntry.getIpAddr(), countVisitsRealUsers.get(logEntry.getIpAddr()) + 1);
+            } else countVisitsRealUsers.put(logEntry.getIpAddr(), 1);
         }
 
+        if (Integer.toString(logEntry.getResponseCode()).charAt(0) == '4' || Integer.toString(logEntry.getResponseCode()).charAt(0) == '5') {
+            countErrors++;
+        }
+
+        if (!logEntry.getReferer().equals("-") && logEntry.getReferer().contains("https://")) {
+            String referer = logEntry.getReferer().replaceAll("https://", "");
+            this.domains.add(referer.substring(0, referer.indexOf('/')));
+        }
     }
+
 
     public int getTrafficRate() {
         int hour = getAmountHours();
@@ -111,42 +137,35 @@ public class Statistics {
     }
 
     public ArrayList<String> getAllExistPages() {
-        List<String> pages = new ArrayList<>();
-        for (String page : allPages) {
-            pages.add(page);
-        }
+        List<String> pages = new ArrayList<>(allPages);
         return new ArrayList<>(pages);
     }
 
     public HashMap<String, Double> getStatisticsOs() {
-        Integer countRequest = 0;
-        for (Map.Entry<String, Integer> entry : occurrenceOs.entrySet()) {
-            countRequest += entry.getValue();
-        }
-        for (Map.Entry<String, Integer> entry : occurrenceOs.entrySet()) {
-            fractionOs.put(entry.getKey(), entry.getValue().doubleValue() / countRequest.doubleValue());
-        }
-        return fractionOs;
+        return getStatisticsHashMap(occurrenceOs, fractionOs);
     }
+
+    public HashMap<String, Double> getStatisticsBrow() {
+        return getStatisticsHashMap(occurrenceBrow, fractionBrow);
+    }
+
+    private HashMap<String, Double> getStatisticsHashMap(HashMap<String, Integer> occurrence, HashMap<String, Double> fraction) {
+        Integer countRequest = 0;
+        for (Integer value : occurrence.values()) {
+            countRequest += value;
+        }
+        for (Map.Entry<String, Integer> entry : occurrence.entrySet()) {
+            double fractionValue = entry.getValue().doubleValue() / countRequest.doubleValue();
+            fractionValue = Math.round(fractionValue * 1000.0) / 1000.0;
+            fraction.put(entry.getKey(), fractionValue);
+        }
+        return fraction;
+    }
+
 
     public ArrayList<String> getNoExistPages() {
-        List<String> pages = new ArrayList<>();
-        for (String page : noExistPages) {
-            pages.add(page);
-        }
+        List<String> pages = new ArrayList<>(noExistPages);
         return new ArrayList<>(pages);
-    }
-
-    public HashMap<String, Double> getStatisticsBrow () {
-        Integer countRequest = 0;
-        for (Map.Entry<String, Integer> entry : occurrenceBrow.entrySet()) {
-            countRequest += entry.getValue();
-        }
-        for (Map.Entry<String, Integer> entry : occurrenceBrow.entrySet()) {
-            fractionBrow.put(entry.getKey(), entry.getValue().doubleValue() / countRequest.doubleValue());
-
-        }
-        return fractionBrow;
     }
 
     public int getAvgCountVisits() {
@@ -159,8 +178,21 @@ public class Statistics {
         return countErrors / hour;
     }
 
-    public int getAvgVisitsOneUser () {
+    public int getAvgVisitsOneUser() {
         return countVisits / ipRealUsers.size();
+    }
+
+    public int getMaxCountRequestPerSec() {
+        return countRequestPerSec.values().stream().mapToInt(sec -> sec).max().orElse(0);
+    }
+
+    public ArrayList<String> getWebsiteWithLinksCurrentSite() {
+        List<String> pages = new ArrayList<>(domains);
+        return new ArrayList<>(pages);
+    }
+
+    public int getMaxCountVisitsRealUser() {
+        return countVisitsRealUsers.values().stream().mapToInt(countRequests -> countRequests).max().orElse(0);
     }
 
 }

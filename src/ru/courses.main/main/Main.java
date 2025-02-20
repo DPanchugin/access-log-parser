@@ -83,13 +83,16 @@ public class Main {
         System.out.println("Средний объём трафика за час: " + statistics.getTrafficRate());
         System.out.println("Доля запросов от Googlebot в %: " + (double) (countGoogle * 100) / countLine);
         System.out.println("Доля запросов от YandexBot в %: " + (double) (countYandex * 100) / countLine);
-        System.out.println("Список существующих страниц сайта: " + statistics.getAllExistPages());
+        //System.out.println("Список существующих страниц сайта: " + statistics.getAllExistPages());
         System.out.println("Доли запросов от разных ОС: " + statistics.getStatisticsOs());
-        System.out.println("Список несуществующих страниц сайта: " + statistics.getNoExistPages());
+        // System.out.println("Список несуществующих страниц сайта: " + statistics.getNoExistPages());
         System.out.println("Доли запросов от разных браузеров: " + statistics.getStatisticsBrow());
         System.out.println("Среднее количество посещений сайта за час: " + statistics.getAvgCountVisits());
         System.out.println("Среднее количество ошибочных запросов в час: " + statistics.getAvgCountErrors());
         System.out.println("Средняя посещаемость одним пользователем: " + statistics.getAvgVisitsOneUser());
+        System.out.println("Максимально количество запросов в секунду: " + statistics.getMaxCountRequestPerSec());
+        System.out.println("Список сайтов, со страниц которых есть ссылки на текущий сайт: " + statistics.getWebsiteWithLinksCurrentSite());
+        System.out.println("Максимально количество посещений одним из пользователей: " + statistics.getMaxCountVisitsRealUser());
         scanner.close();
     }
 
